@@ -65,8 +65,10 @@ if st.button("🔍 Research"):
                         f"{elapsed_time}s"
                     )
 
-                st.subheader("📄 Research Report")
+                st.subheader("📊 Key Statistics")
+                st.markdown(result["statistics"])
 
+                st.subheader("📄 Research Report")
                 st.markdown(result["report"])
 
                 st.download_button(

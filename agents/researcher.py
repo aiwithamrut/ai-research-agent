@@ -1,4 +1,5 @@
 import google.generativeai as genai
+from agents.statistics_agent import extract_statistics
 from tools.search_tool import web_search
 from dotenv import load_dotenv
 import os
@@ -24,7 +25,7 @@ def research_agent(query):
         for r in results[:5]
         if "url" in r
     ]
-
+    statistics = extract_statistics(content)
     prompt = f"""
 You are a Senior Research Analyst at a top consulting firm.
 
@@ -33,6 +34,9 @@ Research Topic:
 
 Source Information:
 {content}
+
+Extracted Statistics:
+{statistics}
 
 Create a PROFESSIONAL research report.
 
@@ -73,6 +77,7 @@ Make the report visually clean and easy to scan.
     response = model.generate_content(prompt)
 
     return {
-        "report": response.text,
-        "sources": sources
-    }
+    "report": response.text,
+    "statistics": statistics,
+    "sources": sources
+     }
