@@ -1,13 +1,15 @@
-from openai import OpenAI
+import google.generativeai as genai
 from tools.search_tool import web_search
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+genai.configure(
+    api_key=os.getenv("GEMINI_API_KEY")
 )
+
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 def research_agent(query):
 
@@ -17,26 +19,60 @@ def research_agent(query):
         [r["content"] for r in results[:5]]
     )
 
+    sources = [
+        r["url"]
+        for r in results[:5]
+        if "url" in r
+    ]
+
     prompt = f"""
-    Research this topic:
+You are a Senior Research Analyst at a top consulting firm.
 
-    {query}
+Research Topic:
+{query}
 
-    Here is information from web:
+Source Information:
+{content}
 
-    {content}
+Create a PROFESSIONAL research report.
 
-    Give a clean summary with key points.
-    """
+Rules:
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
+- Use clear markdown formatting.
+- Use short paragraphs.
+- Use bullet points.
+- Be concise but insightful.
+- Avoid repetition.
+- Focus on actionable insights.
+- Write like a consultant, not a chatbot.
 
-    return response.choices[0].message.content
+Structure:
+
+# 📋 Executive Summary
+(100-150 words)
+
+# 🔍 Key Findings
+(5-8 bullet points)
+
+# 📈 Major Trends
+(3-5 important trends)
+
+# ⚠️ Risks & Challenges
+(3-5 risks)
+
+# 💡 Strategic Opportunities
+(3-5 opportunities)
+
+# 🎯 Conclusion
+(Short conclusion)
+
+Important:
+Make the report visually clean and easy to scan.
+"""
+
+    response = model.generate_content(prompt)
+
+    return {
+        "report": response.text,
+        "sources": sources
+    }
