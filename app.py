@@ -68,6 +68,9 @@ if st.button("🔍 Research"):
                 st.subheader("📊 Key Statistics")
                 st.markdown(result["statistics"])
 
+                st.subheader("✅ Validation Report")
+                st.markdown(result["validation"])
+                
                 st.subheader("📄 Research Report")
                 st.markdown(result["report"])
 

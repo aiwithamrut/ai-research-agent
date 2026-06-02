@@ -1,5 +1,6 @@
 import google.generativeai as genai
 from agents.statistics_agent import extract_statistics
+from agents.fact_checker import fact_check
 from tools.search_tool import web_search
 from dotenv import load_dotenv
 import os
@@ -26,6 +27,7 @@ def research_agent(query):
         if "url" in r
     ]
     statistics = extract_statistics(content)
+    validation = fact_check(statistics)
     prompt = f"""
 You are a Senior Research Analyst at a top consulting firm.
 
@@ -79,5 +81,6 @@ Make the report visually clean and easy to scan.
     return {
     "report": response.text,
     "statistics": statistics,
+    "validation": validation,
     "sources": sources
-     }
+ }
