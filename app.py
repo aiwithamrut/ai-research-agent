@@ -3,11 +3,25 @@ import streamlit as st
 from pdf_generator import create_pdf
 from agents.researcher import research_agent
 
+
 st.set_page_config(
     page_title="AI Research Assistant",
     page_icon="🤖",
     layout="wide"
 )
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+st.sidebar.title("📜 History")
+
+for item in reversed(st.session_state.history):
+
+    with st.sidebar.expander(item["query"]):
+
+        st.write(
+            item["report"][:300] + ("..." if len(item["report"]) > 300 else "")
+        )
+
 
 st.title("🤖 AI Research Assistant")
 
@@ -38,6 +52,15 @@ if st.button("🔍 Research"):
             try:
 
                 result = research_agent(query)
+                st.session_state.history.append(
+                    {
+                        "query" : query,
+                        "report" : result["report"]
+                    }
+                )
+
+                st.session_state.history = st.session_state.history[-10:]
+
 
                 elapsed_time = round(
                     time.time() - start_time,
